@@ -10,12 +10,16 @@ var config = {
 
   var database = firebase.database();
 
+  var now = moment().format('h:mm');
+  
+  console.log(now);
+
   $("#add-train").on("click", function (event) {
       event.preventDefault();
 
       var train = $("#train-name").val().trim();
       var destination = $("#destination").val().trim();
-      var time = $("#train-time").val().trim();
+      var time = moment($("#train-time").val().trim(), "h:mm").format("LT");
       var freq = $("#freq").val().trim();
 
       var newTrain = {
@@ -56,8 +60,10 @@ var config = {
     $(".table tbody").append(
         "<tr><td>" + train + "</td>"
         +"<td>" + destination + "</td>"
-        +"<td>" + time + "</td>"
         +"<td>" + freq + "</td>"
+        +"<td></td>"
+        +"<td></td>"
         +"</tr>"
     );
   });
+
