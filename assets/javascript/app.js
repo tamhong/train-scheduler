@@ -10,16 +10,12 @@ var config = {
 
   var database = firebase.database();
 
-  var now = moment().format('h:mm');
-  
-  console.log(now);
-
   $("#add-train").on("click", function (event) {
       event.preventDefault();
 
       var train = $("#train-name").val().trim();
       var destination = $("#destination").val().trim();
-      var time = moment($("#train-time").val().trim(), "h:mm").format("LT");
+      var time = moment($("#train-time").val().trim(), "hh:mm").format("LT");
       var freq = $("#freq").val().trim();
 
       var newTrain = {
@@ -49,6 +45,21 @@ var config = {
     var destination = childSnapshot.val().destination;
     var time = childSnapshot.val().time;
     var freq = childSnapshot.val().frequency;
+    //Using moment to convert first train time to "moment time"
+    //Subtracting 1 year to get the earliest possible start time
+    var convTime = moment(time, "hh:mm").subtract(1, 'years');
+    //Finding difference between earliest possible start time and current "moment time" in minutes
+    var timeDif = moment().diff(moment(convTime), "minutes");
+    //Taking total time difference and dividing by frequency; remainder of this is what time apart will be; modulus returns remainder--often used to determine even/odd numbers
+    var timeApart = timeDif % freq;
+    //Subtracting how many times train comes since initial start time from frequency to get minutes until next train
+    var nextMin = freq - timeApart;
+    //Adding nextMin to moment time to get next arrival time
+    var nextArr = moment().add(nextMin, "m").format("LT");
+
+    console.log("timeDif: " + timeDif);
+    console.log("timeApart: " + timeApart);
+    console.log("nextMin: " + nextMin);
 
     console.log(childSnapshot.val());
 
@@ -61,8 +72,8 @@ var config = {
         "<tr><td>" + train + "</td>"
         +"<td>" + destination + "</td>"
         +"<td>" + freq + "</td>"
-        +"<td></td>"
-        +"<td></td>"
+        +"<td>" + nextArr + "</td>"
+        +"<td>" + nextMin + "</td>"
         +"</tr>"
     );
   });
